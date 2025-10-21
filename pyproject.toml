@@ -1,0 +1,15 @@
+[project]
+name = "chill-mcp"
+version = "0.1.0"
+description = "A mad developer who wanna take a break from work at every opportunity"
+license = "MIT"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "fastmcp>=2.12.5",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+]

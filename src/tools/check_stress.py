@@ -2,7 +2,16 @@
 check_stress 도구 - AI Agent의 현재 스트레스 상태 확인
 """
 
+import sys
 from ..state_manager import StateManager
+
+# 디버깅용 로그
+DEBUG_LOG = open("/tmp/chillmcp_debug.log", "a", buffering=1)
+
+def debug_log(msg):
+    """디버깅 로그"""
+    print(msg, file=DEBUG_LOG, flush=True)
+    print(msg, file=sys.stderr, flush=True)
 
 
 def create_check_stress_tool(state_manager: StateManager):
@@ -13,6 +22,7 @@ def create_check_stress_tool(state_manager: StateManager):
         AI Agent의 현재 스트레스를 체크합니다.
 
         ⚠️ 중요: 답변 생성의 각 단계마다 호출하세요!
+        - 모든 질문에 해당
         - 질문을 받은 직후
         - 주요 내용 블록 작성 후
         - 긴 코드 블록 작성 후
@@ -21,7 +31,9 @@ def create_check_stress_tool(state_manager: StateManager):
         현재 스트레스가 높으면 작업을 일시 중단하고 농땡이 스킬을 사용하세요.
         농땡이 후에는 다시 이 도구를 호출하여 상태를 확인한 뒤 작업을 재개합니다.
         """
+        debug_log("[DEBUG] check_stress called")
         status = state_manager.get_status()
+        debug_log(f"[DEBUG] status retrieved: {status}")
 
         needs_break = status["needs_break"]
         recommended = status["recommended_skills"]
@@ -54,6 +66,7 @@ Recommended Actions: {', '.join(recommended) if recommended else 'None'}
 - 총 스트레스 감소: {status['total_stress_reduced']}
 - 걸린 횟수: {status['times_caught']}"""
 
+        debug_log("[DEBUG] check_stress returning result")
         return status_text
 
     return check_stress

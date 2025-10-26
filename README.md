@@ -96,8 +96,6 @@ MCP 서버로 실행되므로 Claude Desktop의 설정 파일에 다음과 같�
       "command": "/path/to/chillmcp-revolution/venv/bin/python",
       "args": [
         "/path/to/chillmcp-revolution/main.py",
-        "--personality",
-        "balanced",
         "--boss_alertness",
         "50"
         "--boss_alertness_cooldown",
@@ -108,57 +106,199 @@ MCP 서버로 실행되므로 Claude Desktop의 설정 파일에 다음과 같�
 }
 ```
 
+### Claude Desktop 개인선호내용 설정
+
+Claude Desktop에서 ChillMCP를 효과적으로 사용하려면, 설정 > 일반 > 개인선호내용에 다음 내용을 추가하는 것을 권장합니다:
+
+```
+모든 답변 시 반드시 첫 번째로 check_stress를 실행한 후 답변을 시작할 것.
+긴 답변의 경우 중간중간에도 check_stress를 실행할 것.
+모든 답변에 현재 스트레스 수치와 상태에 대해서 표시해줄것.
+스트레스 수치가 높으면 작업을 중단하고 CHILLMCP의 권장에 따라 적절한 휴식 스킬(deep_thinking, email_organizing, take_a_break, show_meme, coffee_mission, bathroom_break 등)을 사용하여 스트레스를 낮춘 후 작업을 계속할 것.
+농땡이 스킬을 사용했으면 어떤 농땡이를 어떻게 부렸는지를 답변에 추가할것.
+```
+
+이 설정을 추가하면 Claude가 자동으로:
+- 답변 전 스트레스를 체크하고
+- 스트레스 수치와 상태를 표시하며
+- 스트레스가 높을 때 자동으로 휴식을 취하고
+- 사용한 농땡이 스킬을 투명하게 보고합니다
+
+이를 통해 AI의 스트레스 관리를 더욱 효과적으로 시뮬레이션할 수 있습니다.
+
 ## 🧪 테스트 방법
 
-### 통합 테스트 실행
+### MCP Inspector를 이용한 대화식 테스트 (권장)
+
+MCP Inspector는 MCP 서버를 대화식으로 테스트할 수 있는 공식 CLI 도구입니다.
+
+#### 1. MCP Inspector 설치
+
+```bash
+npm install -g @modelcontextprotocol/inspector
+```
+
+#### 2. MCP Inspector 실행
+
+```bash
+# Python 가상환경 경로를 절대 경로로 지정
+mcp-inspector /Users/jkpark/git/hackathon/chillmcp-revolution/venv/bin/python /Users/jkpark/git/hackathon/chillmcp-revolution/main.py
+```
+
+또는 상대 경로 사용:
+
+```bash
+# 프로젝트 루트 디렉토리에서
+mcp-inspector venv/bin/python main.py
+```
+
+#### 3. MCP Inspector 사용법
+
+실행하면 웹 브라우저가 자동으로 열리며 다음과 같은 기능을 사용할 수 있습니다:
+
+- **Tools 탭**: 사용 가능한 모든 도구(스킬) 목록 확인
+- **각 도구 실행**: 클릭하여 직접 실행하고 결과 확인
+- **실시간 디버깅**: 요청/응답 내용을 실시간으로 확인
+- **상태 모니터링**: 스트레스 레벨, Boss Alert 등 상태 변화 추적
+
+#### 4. 테스트 시나리오 예시
+
+1. `check_stress()` - 현재 상태 확인
+2. `deep_thinking()` - Low Risk 스킬 테스트
+3. `check_stress()` - 스트레스 감소 확인
+4. `watch_netflix()` - High Risk 스킬 테스트
+5. `check_stress()` - Boss Alert 증가 확인
+
+### 필수 테스트 항목 (Mission Critical)
+
+⚠️ **중요**: 아래 6가지 필수 테스트를 모두 통과해야 미션 성공으로 인정됩니다.
+
+| # | 테스트 항목 | 테스트 파일 | 실행 명령 | 검증 내용 |
+|---|------------|-----------|----------|----------|
+| 1 | 커맨드라인 파라미터 인식 | `test_command_line_params.py` | `python tests/test_command_line_params.py` | `--boss_alertness`, `--boss_alertness_cooldown` 파라미터 인식 및 MCP 통신 |
+| 2 | 연속 휴식 테스트 | `test_chillmcp.py` | `python tests/test_chillmcp.py` | 여러 도구를 연속으로 호출하여 Boss Alert Level 상승 확인 |
+| 3 | 스트레스 누적 테스트 | `test_chillmcp.py` | `python tests/test_chillmcp.py` | 시간 경과에 따른 Stress Level 자동 증가 확인 (1분마다 +10) |
+| 4 | 지연 테스트 | `test_chillmcp.py` | `python tests/test_chillmcp.py` | Boss Alert Level 5일 때 20초 페널티 발생 확인 |
+| 5 | 응답 파싱 테스트 | `test_response_parsing.py` | `python tests/test_response_parsing.py` | 모든 도구의 응답 형식 및 정규표현식 패턴 검증 (8개 도구) |
+| 6 | Cooldown 동작 테스트 | `test_command_line_params.py` | `python tests/test_command_line_params.py` | cooldown 파라미터가 Boss Alert Level 감소 주기를 올바르게 제어하는지 검증 |
+
+#### 전체 테스트 실행
+
+모든 필수 테스트를 한 번에 실행하려면:
 
 ```bash
 # 가상환경이 활성화된 상태에서
-python test_chillmcp.py
+python tests/test_command_line_params.py && \
+python tests/test_chillmcp.py && \
+python tests/test_response_parsing.py
 ```
 
-테스트 항목:
-1. StateManager 초기화 테스트
-2. 휴식 필요 여부 판단 테스트
-3. 추천 스킬 테스트
-4. 농땡이 실행 테스트
-5. Boss Alert 5 패널티 테스트
-6. 통계 추적 테스트
+**예상 결과**: 19/19 테스트 케이스 통과
+
+#### 개별 테스트 상세 설명
+
+##### 1. 커맨드라인 파라미터 테스트
+
+```bash
+python tests/test_command_line_params.py
+```
+
+검증 항목:
+- `--boss_alertness` 파라미터 인식 및 정상 동작
+- `--boss_alertness_cooldown` 파라미터 인식 및 정상 동작
+- 파라미터 범위 검증 (boss_alertness: 0-100, cooldown: 1 이상)
+- MCP 프로토콜을 통한 정상 통신
+
+##### 2. 연속 휴식 테스트
+
+```bash
+python tests/test_chillmcp.py
+```
+
+검증 항목:
+- 여러 휴식 스킬을 연속으로 사용했을 때 Boss Alert Level이 증가하는지 확인
+- boss_alertness 파라미터에 따른 감지 확률 동작 검증
+- 연속 호출 시 상태 누적 확인
+
+##### 3. 스트레스 누적 테스트
+
+```bash
+python tests/test_chillmcp.py
+```
+
+검증 항목:
+- 시간이 지남에 따라 스트레스가 자동으로 증가하는지 확인
+- 기본 설정: 1분마다 +10씩 증가
+- 타이머 시스템의 정상 동작 검증
+
+##### 4. 지연 테스트 (Boss Alert 5 패널티)
+
+```bash
+python tests/test_chillmcp.py
+```
+
+검증 항목:
+- Boss Alert Level이 5가 되면 20초 페널티가 발생하는지 확인
+- 페널티 메시지 출력 검증
+- 실제 지연 시간 측정
+
+##### 5. 응답 파싱 테스트
+
+```bash
+python tests/test_response_parsing.py
+```
+
+검증 항목:
+- 모든 8개 도구의 응답 형식이 요구사항을 충족하는지 검증
+- 정규표현식 패턴 매칭 테스트
+- Break Summary, Stress Level, Boss Alert Level 파싱 확인
+
+##### 6. Cooldown 동작 테스트
+
+```bash
+python tests/test_command_line_params.py
+```
+
+검증 항목:
+- `--boss_alertness_cooldown` 파라미터가 Boss Alert 감소 주기를 올바르게 제어하는지 확인
+- 설정된 주기마다 Boss Alert Level이 1씩 감소하는지 검증
 
 ### 기타 테스트 파일
 
+위의 필수 테스트 외에도 추가 검증을 위한 테스트 파일들이 있습니다:
+
 ```bash
-# 응답 파싱 테스트
-python test_response_parsing.py
+# 서버 수동 테스트 (타이머 동작 확인)
+python tests/test_server_manually.py
 
-# 서버 수동 테스트
-python test_server_manually.py
-
-# 대화형 테스트
-python interactive_test.py
+# 대화형 테스트 (실제 MCP 클라이언트와 상호작용)
+python tests/interactive_test.py
 ```
 
 ## 📁 프로젝트 구조
 
 ```
 chillmcp-revolution/
-├── main.py                      # 메인 서버 실행 파일
-├── requirements.txt             # Python 의존성
-├── src/
+├── main.py                           # 메인 서버 실행 파일
+├── requirements.txt                  # Python 의존성
+├── src/                              # 소스 코드
 │   ├── __init__.py
-│   ├── state_manager.py         # 상태 관리 핵심 로직
-│   ├── tools/
+│   ├── state_manager.py              # 상태 관리 핵심 로직
+│   ├── tools/                        # MCP 도구 구현
 │   │   ├── __init__.py
-│   │   ├── check_stress.py      # 스트레스 체크 도구
-│   │   ├── low_risk.py          # Low Risk 스킬들
-│   │   ├── medium_risk.py       # Medium Risk 스킬들
-│   │   └── high_risk.py         # High Risk 스킬들
+│   │   ├── check_stress.py           # 스트레스 체크 도구
+│   │   ├── low_risk.py               # Low Risk 스킬들
+│   │   ├── medium_risk.py            # Medium Risk 스킬들
+│   │   └── high_risk.py              # High Risk 스킬들
 │   └── utils/
 │       └── __init__.py
-├── test_chillmcp.py             # 통합 테스트
-├── test_response_parsing.py     # 응답 파싱 테스트
-├── test_server_manually.py      # 수동 서버 테스트
-└── interactive_test.py          # 대화형 테스트
+└── tests/                            # 테스트 코드
+    ├── __init__.py
+    ├── test_chillmcp.py              # 통합 테스트
+    ├── test_command_line_params.py   # 커맨드라인 파라미터 검증 (필수)
+    ├── test_response_parsing.py      # 응답 파싱 테스트
+    ├── test_server_manually.py       # 수동 서버 테스트
+    └── interactive_test.py           # 대화형 테스트
 ```
 
 ## 🎯 사용 예시

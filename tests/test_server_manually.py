@@ -4,7 +4,13 @@ ChillMCP 서버 수동 테스트 스크립트
 타이머와 도구 실행을 직접 테스트
 """
 
+import sys
+import os
 import asyncio
+
+# 프로젝트 루트를 sys.path에 추가
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from src.state_manager import StateManager
 from src.tools.check_stress import create_check_stress_tool
 

@@ -5,7 +5,13 @@
 """
 
 import re
+import sys
+import os
 import asyncio
+
+# 프로젝트 루트를 sys.path에 추가
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from src.state_manager import StateManager
 from src.tools.low_risk import create_low_risk_tools
 from src.tools.medium_risk import create_medium_risk_tools

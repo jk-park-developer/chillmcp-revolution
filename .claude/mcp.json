@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "chillmcp": {
+      "command": "python",
+      "args": [
+        "/Users/jkpark/git/hackathon/chillmcp-revolution/main.py"
+      ],
+      "env": {}
+    }
+  }
+}

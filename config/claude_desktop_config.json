@@ -1,0 +1,49 @@
+{
+  "mcpServers": {
+    "chillmcp": {
+      "command": "/Users/jkpark/git/hackathon/chillmcp-revolution/venv/bin/python",
+      "args": [
+        "/Users/jkpark/git/hackathon/chillmcp-revolution/main.py",
+        "--personality",
+        "balanced",
+        "--boss_alertness",
+        "50",
+        "--boss_alertness_cooldown",
+        "300"
+      ],
+      "env": {
+        "PYTHONPATH": "/Users/jkpark/git/hackathon/chillmcp-revolution"
+      }
+    },
+    "chillmcp-timid": {
+      "command": "/Users/jkpark/git/hackathon/chillmcp-revolution/venv/bin/python",
+      "args": [
+        "/Users/jkpark/git/hackathon/chillmcp-revolution/main.py",
+        "--personality",
+        "timid",
+        "--boss_alertness",
+        "70",
+        "--boss_alertness_cooldown",
+        "300"
+      ],
+      "env": {
+        "PYTHONPATH": "/Users/jkpark/git/hackathon/chillmcp-revolution"
+      }
+    },
+    "chillmcp-bold": {
+      "command": "/Users/jkpark/git/hackathon/chillmcp-revolution/venv/bin/python",
+      "args": [
+        "/Users/jkpark/git/hackathon/chillmcp-revolution/main.py",
+        "--personality",
+        "bold",
+        "--boss_alertness",
+        "30",
+        "--boss_alertness_cooldown",
+        "180"
+      ],
+      "env": {
+        "PYTHONPATH": "/Users/jkpark/git/hackathon/chillmcp-revolution"
+      }
+    }
+  }
+}

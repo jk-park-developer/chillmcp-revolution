@@ -25,7 +25,7 @@ ChillMCP는 AI Agent의 스트레스를 관리하는 시뮬레이터 MCP 서버�
 ### 1. 저장소 클론
 
 ```bash
-git clone https://github.com/yourusername/chillmcp-revolution.git
+git https://github.com/jk-park-developer/chillmcp-revolution.git
 cd chillmcp-revolution
 ```
 
